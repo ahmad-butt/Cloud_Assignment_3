@@ -24,7 +24,7 @@ tz = pytz.timezone('Asia/Karachi')
 
 
 def log_performance():
-    res = requests.get(f'http://127.0.0.1:8001/api/monitor/1')
+    res = requests.get(f'http://worker-1:8000/api/monitor/1')
     performance = res.json()
     performance['timestamp'] = datetime.datetime.now(tz)
 
@@ -44,9 +44,9 @@ def get_latest_primes_list():
     if not os.path.exists(performance_log_path):
         os.makedirs(os.path.dirname(performance_log_path), exist_ok=True)
     updated_primes = []
-    res1 = requests.get(f'http://127.0.0.1:8001/api/get')
-    res2 = requests.get(f'http://127.0.0.1:8002/api/get')
-    res3 = requests.get(f'http://127.0.0.1:8003/api/get')
+    res1 = requests.get(f'http://worker-1:8000/api/get')
+    res2 = requests.get(f'http://worker-2:8000/api/get')
+    res3 = requests.get(f'http://worker-3:8000/api/get')
 
     updated_primes = res1.json()['primes'] + \
         res2.json()['primes']+res3.json()['primes']
@@ -69,11 +69,11 @@ def periodic(interval, func):
 
 def invoke(request):
     prime_range = math.floor(10**12/3)
-    requests.get(f'http://127.0.0.1:8001/api/generate/1/{prime_range}')
+    requests.get(f'http://worker-1:8000/api/generate/1/{prime_range}')
     requests.get(
-        f'http://127.0.0.1:8002/api/generate/{prime_range+1}/{prime_range*2}')
+        f'http://worker-2:8000/api/generate/{prime_range+1}/{prime_range*2}')
     requests.get(
-        f'http://127.0.0.1:8003/api/generate/{prime_range*2+1}/{(prime_range*3)+1}')
+        f'http://worker-3:8000/api/generate/{prime_range*2+1}/{(prime_range*3)+1}')
 
     thread = threading.Thread(
         target=periodic, args=(log_interval, log_performance))

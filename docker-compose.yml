@@ -1,34 +1,28 @@
 version: '3'
 services:
   master_api:
-    image: cc_assignment_3_master
-    ports:
-      - "8000:8000"
-    networks:
-      - my-network
-    depends_on:
-      - worker_api_1
-      - worker_api_2
-      - worker_api_3
-
-  worker_api_1:
-    image: cc_assignment_3_worker
+    build: .
     ports:
       - "8001:8000"
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     networks:
       - my-network
 
-  worker_api_2:
-    image: cc_assignment_3_worker
-    ports:
-      - "8002:8000"
+  worker-1:
+    image: cc_assignment_3
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     networks:
       - my-network
 
-  worker_api_3:
-    image: cc_assignment_3_worker
-    ports:
-      - "8003:8000"
+  worker-2:
+    image: cc_assignment_3
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - my-network
+
+  worker-3:
+    image: cc_assignment_3
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     networks:
       - my-network
 
