@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import threading
@@ -12,6 +12,8 @@ primes = queue.Queue()
 lock = threading.Lock()
 
 # Utility Functions
+
+
 def is_prime(num):
     if num < 2:
         return False
@@ -33,19 +35,28 @@ def start_generation(start, end):
     t.start()
 
 # Create your views here.
-def generate(request, start, end):
-    start_generation(start, end)
-    return HttpResponse("Generating Prime Numbers...")
 
+
+def generate(request, start, end):
+    global primes
+    primes = queue.Queue()
+    start_generation(start, end)
+    return HttpResponse(F"Generating Prime Numbers from {start} to {end}...")
+
+
+@api_view(['GET'])
 def monitor(request, k):
     cpu_usage = psutil.cpu_percent(interval=k, percpu=False)
     memory_usage = psutil.virtual_memory().percent
 
-    s = f'CPU Usage: {cpu_usage} ----- Memory Usage: {memory_usage}'
-    
-    return HttpResponse(s)
+    context = {
+        'cpu_usage': cpu_usage,
+        'memory_usage': memory_usage
+    }
+
+    return Response(context)
+
 
 def get(request):
     with lock:
-        s = ", ".join(str(i) for i in primes.queue)
-        return HttpResponse(s)
+        return JsonResponse({"primes": list(primes.queue)})

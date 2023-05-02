@@ -1,0 +1,37 @@
+version: '3'
+services:
+  master_api:
+    image: cc_assignment_3_master
+    ports:
+      - "8000:8000"
+    networks:
+      - my-network
+    depends_on:
+      - worker_api_1
+      - worker_api_2
+      - worker_api_3
+
+  worker_api_1:
+    image: cc_assignment_3_worker
+    ports:
+      - "8001:8000"
+    networks:
+      - my-network
+
+  worker_api_2:
+    image: cc_assignment_3_worker
+    ports:
+      - "8002:8000"
+    networks:
+      - my-network
+
+  worker_api_3:
+    image: cc_assignment_3_worker
+    ports:
+      - "8003:8000"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
